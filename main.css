@@ -1,0 +1,63 @@
+:root{
+    font-family: Arial, Helvetica, sans-serif;
+    --background-color: black;
+    --border-color: white;
+    --main-color: white;
+    --border-radius: 10px;
+
+    --navbar-width-compact: 10vh;
+    --navbar-width-extended: 30vh;
+    --navbar-bgcolor-back: hsl(180, 100%, 50%);
+    --navbar-bgcolor-item: hsl(180, 100%, 45%);
+    --navbar-border-radius: 20px;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+.LightMode{
+    --background-color: white;
+    --border-color: black;
+    --main-color: black;
+}
+
+body{
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+
+    background-color: var(--background-color);
+}
+
+#MainContainer{
+    display: flex;
+    min-width: 0;
+
+    padding: 1vh;
+    gap: 1vh;
+
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+#CanvasContainer{
+    min-width: 0;
+    min-height: 0;
+
+    flex-grow: 1;
+}
+
+#MainCanvas{
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+}

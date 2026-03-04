@@ -1,0 +1,65 @@
+#InputBar{
+    display: flex;
+    height: 15vh;
+    min-height: fit-content;
+
+    flex-direction: column;
+}
+
+#ControlBar{
+    height: 5vh;
+    border: 2px solid green;
+}
+
+#OpBar{
+    display: flex;
+    min-width: 0;
+    width: 100%;
+
+    gap: 1vh;
+    padding: 1vh;
+    align-items: stretch;
+
+    border: 2px solid var(--border-color);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+
+    overflow: hidden;
+    overflow-x: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: var(--main-color) var(--background-color);
+}
+
+.OpContainer{
+    display: flex;
+    
+    flex-direction: column;
+}
+
+.OpContainer > button{
+    min-width: 15vh;
+}
+
+.InputDiv{
+    display: flex;
+
+    gap: 1vh;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 1vh;
+}
+
+.InputDiv label{
+    flex-shrink: 0;
+
+    color: var(--main-color);
+}
+
+.InputDiv input{
+    display: block;
+    min-width: 0;
+    width: 5em;
+
+    flex-shrink: 1;
+}
