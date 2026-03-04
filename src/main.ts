@@ -3,10 +3,10 @@ import * as Utils from './utils.js';
 import * as Input from './input.js';
 import * as Draw from './draw.js';
 
-const bodyElement = document.getElementById('Body');
-const canvas = document.getElementById('MainCanvas');
-const displayModeButton = document.getElementById('DisplayModeButton');
-const displayModeText = document.getElementById('DisplayModeText');
+const bodyElement = document.getElementById('Body') as HTMLCanvasElement;
+const canvas = document.getElementById('MainCanvas') as HTMLCanvasElement;
+const displayModeButton= document.getElementById('DisplayModeButton') as HTMLButtonElement;
+const displayModeText = document.getElementById('DisplayModeText') as HTMLDivElement;
 
 displayModeButton.onclick = ()=>{
     if (bodyElement.classList.toggle('LightMode'))
@@ -16,8 +16,8 @@ displayModeButton.onclick = ()=>{
 }
 
 
-for (let i=0; i<20; i++)
-    Input.addOpinput(i,null,'Input: ', 'Value: ', 'Somethinglong: ');
+for (let i : number = 0; i<20; i++)
+    Input.addOpinput(String(i),null,'Input: ', 'Value: ', 'Somethinglong: ');
 
 const DrawObj = new Draw.DrawContext(canvas);
 
