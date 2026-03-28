@@ -7,7 +7,7 @@ const OpBarElement = document.getElementById('OpBar') as HTMLDivElement;
 let inputIDCounter = 0;
 
 //callback accepts input values
-export function addOpinput(name : string, callback : Function | null, ...inputs : any) : void{
+export function addOpinput(name : string, callback : Function | null, ...inputs : string[]) : void{
     let inputValues : HTMLInputElement[] = [];
     const element = Utils.createHTMLElement('div',null,null,'OpContainer') as HTMLDivElement;
     const button = Utils.createHTMLElement('button',element) as HTMLButtonElement;

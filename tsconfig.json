@@ -5,6 +5,7 @@
 
     "target": "esnext",
 
-    "strict": true
+    "strict": true,
+    "noEmitOnError": true
   }
 }
