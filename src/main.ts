@@ -39,10 +39,10 @@ let edge21 = new Graphic.GraphEdge(node2, node1);
 let edge23 = new Graphic.GraphEdge(node2, node3);
 let edge32 = new Graphic.GraphEdge(node3, node2);
 
-edge12.state.curve = true;
-edge21.state.curve = true;
-edge23.state.curve = true;
-edge32.state.curve = true;
+edge12.curve = true;
+edge21.curve = true;
+edge23.curve = true;
+edge32.curve = true;
 
 let drawingObj: {draw: (drawObj: Draw.DrawContext)=>void}[] = [edge12, edge21, edge23, edge32, node1, node2, node3];
 let updateObj: {update: ()=>void}[] = [node1, node2, node3];

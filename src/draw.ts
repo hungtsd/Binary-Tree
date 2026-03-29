@@ -1,15 +1,23 @@
 import * as Config from './config.js';
-import * as Utils from './utils.js';
+import {throttle, mergeObj} from './utils.js';
 import {type Cord, type AngleRadiant, round} from './math.js';
 
 let drawObjs: DrawContext[] = [];
 
-window.addEventListener('resize', Utils.throttle(()=>{
+window.addEventListener('resize', throttle(()=>{
     for (const obj of drawObjs)
         obj.resize();
 }, 50));
 
 type Color = 'black' | 'white' | 'red' | 'blue' | 'green';
+type TextHorizontalPosition = 'left' | 'center' | 'right';
+type TextVerticalPosition = 'top' | 'middle' | 'alphabetic';
+type TextPosition = {
+    horizontal: TextHorizontalPosition,
+    vertical: TextVerticalPosition
+};
+
+const defaultTextPosition: TextPosition = {horizontal: 'left', vertical: 'alphabetic'};
 
 export class DrawContext{
     canvas: HTMLCanvasElement;
@@ -55,10 +63,15 @@ export class DrawContext{
         this.ctx.stroke();
     }
 
-    text(cord: Cord, text: string, size: number): void{
+    text(cord: Cord, text: string, size: number, textPosition: Partial<TextPosition> = {}): void{
         round(cord);
         this.ctx.font = `${size}px Arial`;
         this.ctx.fillStyle = `black`;
+
+        let position = mergeObj(defaultTextPosition, textPosition);
+        this.ctx.textAlign = position.horizontal;
+        this.ctx.textBaseline = position.vertical;
+
         this.ctx.fillText(text, cord.x, cord.y);
     }
 

@@ -1,5 +1,12 @@
 import * as Config from './config.js';
 
+export function mergeObj<T>(objDefault: T, objPartial: Partial<T>): T{
+    let result: T = {...objDefault};
+    for (let property in objPartial)
+        result[property] = objPartial[property]!;
+    return result;
+}
+
 export function createHTMLElement(type : string, parent : HTMLElement | null = null, id: string | null = null, ...className : string[]) : HTMLElement{
     let element = document.createElement(type) as HTMLElement;
     if (parent)

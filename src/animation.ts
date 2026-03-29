@@ -1,4 +1,5 @@
 import {AnimationPropertyCfg} from "./config.js";
+import {mergeObj} from './utils.js';
 
 type FrameCnt = number;
 type Time = number;
@@ -27,55 +28,55 @@ type AnimationSetting = {
 };
 
 export class AnimationProperty<T extends State>{
-    ranges: RangeOf<T>;
-    progress: FrameCnt = 0;
-    duration: FrameCnt;
-    frameStep: FrameCnt = 1;
+    readonly #ranges: RangeOf<T>;
+    #progress: FrameCnt = 0;
+    readonly #duration: FrameCnt;
+    #frameStep: FrameCnt = 1;
 
-    setting: AnimationSetting = AnimationPropertyCfg.defaultSetting;
+    readonly #setting: AnimationSetting;
 
     constructor(stateRange: RangeOf<T>, duration: FrameCnt, setting: Partial<AnimationSetting> = {}){
-        this.ranges = stateRange;
-        this.duration = duration-1;
+        this.#ranges = stateRange;
+        this.#duration = duration-1;
         
-        Object.assign(this.setting, setting);
+        this.#setting = mergeObj(AnimationPropertyCfg.defaultSetting, setting);
     }
 
     get(property: keyof T): number{
-        return this.ranges[property].begin +
-               this.setting.tweenFunc(this.progress/this.duration)*
-              (this.ranges[property].end - this.ranges[property].begin);
+        return this.#ranges[property].begin +
+               this.#setting.tweenFunc(this.#progress/this.#duration)*
+              (this.#ranges[property].end - this.#ranges[property].begin);
     }
     
     set(obj: ValueOf<T>): void{
-        for (let property in this.ranges)
+        for (let property in this.#ranges)
             obj[property] = this.get(property);
     }
 
     nextFrame(): boolean{
-        let nextFrameCnt = this.progress + this.frameStep;
-        if (nextFrameCnt >= this.duration || nextFrameCnt < 0){
-            if (this.setting.loop)
+        let nextFrameCnt = this.#progress + this.#frameStep;
+        if (nextFrameCnt >= this.#duration || nextFrameCnt < 0){
+            if (this.#setting.loop)
                 this.reverse();
             else
                 return false;
         }
-        this.progress = this.progress + this.frameStep;
+        this.#progress = this.#progress + this.#frameStep;
         return true;
     }
 
     reset(): void{
-        this.progress = 0;
+        this.#progress = 0;
     }
 
     finish(): void{
-        if (this.frameStep<0)
-            this.progress = 0;
+        if (this.#frameStep<0)
+            this.#progress = 0;
         else
-            this.progress = this.duration;
+            this.#progress = this.#duration;
     }
 
     reverse(): void{
-        this.frameStep = -this.frameStep;
+        this.#frameStep = -this.#frameStep;
     }
 }
