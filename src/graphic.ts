@@ -1,7 +1,7 @@
 import {AngleRadiant, type Cord, Vector} from './math.js';
-import { DrawContext } from './draw.js';
+import {type Color, DrawContext} from './draw.js';
 import {GraphEdgeCfg, GraphNodeCfg} from './config.js';
-import {AnimationProperty} from './animation.js';
+import {Animation} from './animation.js';
 import {mergeObj} from './utils.js';
 
 const DefaultCord = {x: 0, y: 0};
@@ -20,33 +20,41 @@ export class BoxNode extends Node{
 type GraphNodeState = {
     x: number,
     y: number,
-    scale: number
-}
+    borderColor: Color
+};
 
+type StaticState<T> = T;
+type TweenState<T> = {
+    [K in keyof T as T[K] extends number? K : never]: T[K]
+};
+
+type GraphNodeAnim = Animation<Partial<StaticState<GraphNodeState>>,
+                               Partial<TweenState<GraphNodeState>>
+                               > | null;
 export class GraphNode extends Node{
     #edge: GraphEdge | null = null;
-    state: GraphNodeState = {x: 0, y: 0, scale: 0};
-    #animObj: AnimationProperty<Partial<GraphNodeState>> | null = null;
+    state: GraphNodeState = GraphNodeCfg.defaultState;
+    #animObj: GraphNodeAnim = null;
 
-    set animation(anim: AnimationProperty<Partial<GraphNodeState>> | null){
-        if (this.#animObj){
-            this.#animObj.finish();
-            this.#animObj.set(this.state);
-        }
+    set animation(anim: GraphNodeAnim){
+        if (this.#animObj)
+            this.state = mergeObj(this.state, this.#animObj.valueEnd);
         this.#animObj = anim;
     }
 
     update(): void{
         if (!this.#animObj)
             return;
-        this.#animObj.set(this.state);
+        this.state = mergeObj(this.state, this.#animObj.value);
 
-        if (!this.#animObj.nextFrame())
+        if (!this.#animObj.nextFrame()){
+            this.state = mergeObj(this.state, this.#animObj.valueEnd);
             this.#animObj = null;
+        }
     }
 
     draw(drawObj: DrawContext): void{
-        drawObj.circle(this.state, GraphNodeCfg.radius, GraphNodeCfg.borderWidth, 'black', 'white');
+        drawObj.circle(this.state, GraphNodeCfg.radius, GraphNodeCfg.borderWidth, this.state.borderColor, 'white');
     }
 }
 

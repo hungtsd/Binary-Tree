@@ -3,7 +3,7 @@ import * as Utils from './utils.js';
 import * as Input from './input.js';
 import * as Draw from './draw.js';
 import * as Graphic from './graphic.js';
-import {AnimationProperty, easeFunc, linearFunc} from './animation.js';
+import {Animation, easeFunc, linearFunc} from './animation.js';
 
 const bodyElement = document.getElementById('Body') as HTMLCanvasElement;
 const canvas = document.getElementById('MainCanvas') as HTMLCanvasElement;
@@ -38,62 +38,58 @@ let edge12 = new Graphic.GraphEdge(node1, node2);
 let edge21 = new Graphic.GraphEdge(node2, node1);
 let edge23 = new Graphic.GraphEdge(node2, node3);
 let edge32 = new Graphic.GraphEdge(node3, node2);
+let edge13 = new Graphic.GraphEdge(node1, node3);
 
 edge12.curve = true;
 edge21.curve = true;
 edge23.curve = true;
 edge32.curve = true;
 
-let drawingObj: {draw: (drawObj: Draw.DrawContext)=>void}[] = [edge12, edge21, edge23, edge32, node1, node2, node3];
+let drawingObj: {draw: (drawObj: Draw.DrawContext)=>void}[] = [edge12, edge21, edge23, edge32, edge13, node1, node2, node3];
 let updateObj: {update: ()=>void}[] = [node1, node2, node3];
 
 let mouse_x = 0,
     mouse_y = 0;
 
-node1.animation = new AnimationProperty(
+node1.animation = new Animation(
     {
-        x: {begin: 100, end: 1000}
+        borderColor: {default: 'black', during: 'red'}
     },
-    120
+    {
+        x: {begin: 100, end: 1000},
+    },
+    120,
+    {
+        loop: 4
+    }
 );
 
-node2.animation = new AnimationProperty(
+node2.animation = new Animation(
+    {
+        borderColor: {default: 'black', during: 'blue'}
+    },
     {
         x: {begin: 100, end: 1000}
     },
     120,
     {
         tweenFunc: linearFunc,
-        loop: true
+        loop: 3
     }
 );
 
-node3.animation = new AnimationProperty(
+node3.animation = new Animation(
+    {
+        borderColor: {default: 'black', during: 'green'}
+    },
     {
         x: {begin: 100, end: 1000}
     },
     120,
     {
-        loop: true
+        loop: 5
     }
 );
-
-setTimeout(()=>{
-    node1.animation = null;
-}, 1000);
-
-setTimeout(()=>{
-    node1.animation = new AnimationProperty(
-        {
-            x: {begin: 1000, end: 100},
-            y: {begin: 100, end: 500}
-        },
-        120,
-        {
-            loop: true
-        }
-    );
-}, 4000);
 
 setInterval(()=>{
     DrawObj.fill('white');

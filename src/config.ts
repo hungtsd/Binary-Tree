@@ -8,6 +8,7 @@ const GraphEdgeCfg = {
 };
 
 const GraphNodeCfg = {
+    get defaultState(): {x: number, y: number, borderColor: 'black'}{return {x: 0, y: 0, borderColor: 'black'}},
     get radius(){return 20;},
     get borderWidth(){return 5;}
 };
@@ -16,4 +17,8 @@ const AnimationPropertyCfg = {
     get defaultSetting(){return {tweenFunc: easeFunc, loop: false}}
 };
 
-export {GraphEdgeCfg, GraphNodeCfg, AnimationPropertyCfg};
+const DrawContextCfg = {
+    get defaultSize(){return {minWidth: 2000, minHeight: 1000}}
+};
+
+export {GraphEdgeCfg, GraphNodeCfg, AnimationPropertyCfg, DrawContextCfg};

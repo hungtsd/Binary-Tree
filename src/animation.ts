@@ -3,61 +3,107 @@ import {mergeObj} from './utils.js';
 
 type FrameCnt = number;
 type Time = number;
-type tweenFunction = (t: Time) => Time;
+type TweenFunction = (t: Time) => Time;
 
 export function easeFunc(t: Time): Time{
-    return -2*Math.pow(t, 3) + 3*Math.pow(t, 2);
+    return -2 * t**3 + 3 * t**2;
 }
 
 export function linearFunc(t: Time): Time{
     return t;
 }
 
-type State = Record<string, number>;
+type StaticRange<T> = {
+    default: T,
+    during: T
+}
+type AnimStaticType = {
+    [id: string]: any
+};
+type AnimStaticData<T> = {
+    [property in keyof T]: StaticRange<T[property]>
+}
 
-type RangeOf<T> = Record<keyof T, {
+type TweenRange = {
     begin: number,
-    end: number
-}>;
-
-type ValueOf<T> = Record<keyof T, number>;
-
-type AnimationSetting = {
-    tweenFunc: tweenFunction,
-    loop: boolean
+    end: number,
+    tweenFunc?: TweenFunction
+};
+type AnimTweenType = Record<string, number>;
+type AnimTweenData<T extends AnimTweenType> = {
+    [property in keyof T]: TweenRange
 };
 
-export class AnimationProperty<T extends State>{
-    readonly #ranges: RangeOf<T>;
+type AnimationSetting = {
+    tweenFunc: TweenFunction,
+    loop: number | boolean
+};
+
+export class Animation<
+        StaticType extends AnimStaticType,
+        TweenType extends AnimTweenType
+    >{
+    #staticData: AnimStaticData<StaticType>;
+    #tweenData: AnimTweenData<TweenType>;
     #progress: FrameCnt = 0;
     readonly #duration: FrameCnt;
     #frameStep: FrameCnt = 1;
 
     readonly #setting: AnimationSetting;
 
-    constructor(stateRange: RangeOf<T>, duration: FrameCnt, setting: Partial<AnimationSetting> = {}){
-        this.#ranges = stateRange;
-        this.#duration = duration-1;
+    constructor(staticData: AnimStaticData<StaticType>,
+                tweenData: AnimTweenData<TweenType>,
+                duration: FrameCnt,
+                setting: Partial<AnimationSetting> = {}){
+        this.#staticData = staticData;
+        this.#tweenData = tweenData;
+        this.#duration = duration;
         
         this.#setting = mergeObj(AnimationPropertyCfg.defaultSetting, setting);
     }
 
-    get(property: keyof T): number{
-        return this.#ranges[property].begin +
-               this.#setting.tweenFunc(this.#progress/this.#duration)*
-              (this.#ranges[property].end - this.#ranges[property].begin);
+    #getTweeenValue(range: TweenRange): number{
+        let tweenFunc = range.tweenFunc? range.tweenFunc : this.#setting.tweenFunc;
+        return range.begin +
+               (range.end - range.begin) *
+               tweenFunc(this.#progress/this.#duration);
     }
     
-    set(obj: ValueOf<T>): void{
-        for (let property in this.#ranges)
-            obj[property] = this.get(property);
+    get value(): StaticType & TweenType{
+        let staticValue = Object.fromEntries(Object.entries(this.#staticData).map(([Key, value])=>[
+            Key,
+            (value as StaticRange<any>).during
+        ])) as StaticType;
+        let tweenValue = Object.fromEntries(Object.entries(this.#tweenData).map(([Key, value])=>[
+            Key,
+            this.#getTweeenValue(value)
+        ])) as TweenType;
+        return {...staticValue, ...tweenValue};
+    }
+
+    get valueEnd(): StaticType & TweenType{
+        let staticValue = Object.fromEntries(Object.entries(this.#staticData).map(([Key, value])=>[
+            Key,
+            (value as StaticRange<any>).default
+        ])) as StaticType;
+
+        let property: 'begin'|'end' = this.#frameStep<0 ? 'begin':'end';
+        let tweenValue = Object.fromEntries(Object.entries(this.#tweenData).map(([Key, value])=>[
+            Key,
+            value[property]
+        ])) as TweenType;
+        return {...staticValue, ...tweenValue};
     }
 
     nextFrame(): boolean{
         let nextFrameCnt = this.#progress + this.#frameStep;
         if (nextFrameCnt >= this.#duration || nextFrameCnt < 0){
-            if (this.#setting.loop)
+            if (this.#setting.loop === true)
                 this.reverse();
+            else if (typeof this.#setting.loop === 'number' && this.#setting.loop > 0){
+                this.#setting.loop-= 0.5;
+                this.reverse();
+            }
             else
                 return false;
         }
